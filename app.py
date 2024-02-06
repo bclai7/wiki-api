@@ -43,7 +43,7 @@ def get_top_articles():
     except ValueError:
         return create_response_object("Invalid date entered", "get", 400, "Bad Request")
     except:
-        return create_response_object("Could not complete request. Please make sure your request is valid.", "get", 500, "Could not complete request")
+        return create_response_object("Could not complete request at this time. Please make sure your request is valid or try again later.", "get", 500, "Could not complete request at this time")
     
     
 
