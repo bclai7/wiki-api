@@ -21,6 +21,7 @@ def get_top_articles():
 
     # Check if monthly or weekly
     if year and month and day is None:
+        request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/all-days'
         top_articles_response = requests.get(request_url, headers=HEADERS)
         top_articles_json = {'data': {'type': 'month', 'articles': top_articles_response.json()['items'][0]['articles']}}
     elif year and month and day:
