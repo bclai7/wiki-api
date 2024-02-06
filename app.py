@@ -32,7 +32,7 @@ def get_top_articles():
 
 def get_week_top_articles(year: str, month: str, day: str):
     '''Get the top articles for a week. Takes in the year, month, and day as an argument and returns the top articles for the week starting
-    on the Sunday before the given date throughout the Saturday after the given date'''
+    on the Monday before the given date throughout the Sunday after the given date'''
     # Get list of days in the week for the given date
     days_list = get_weekdays(year, month, day)
 
@@ -40,8 +40,10 @@ def get_week_top_articles(year: str, month: str, day: str):
     article_views_dict = {}
     for day in days_list:
         # Get list of articles for this day
-        request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{day.year}/{day.month}/{day.day}'
+        request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{day.year}/{day:%m}/{day:%d}'
+        print(request_url)
         day_top_articles_response = requests.get(request_url, headers=HEADERS)
+        print('response, ', day, day_top_articles_response)
         day_top_articles_json = day_top_articles_response.json()
         day_top_articles_list = day_top_articles_json['items'][0]['articles']
         
@@ -63,12 +65,12 @@ def get_week_top_articles(year: str, month: str, day: str):
 
 
 def get_weekdays(year: str, month: str, day: str) -> list:
-    '''Get all of the dates of the week for a given date, from Sunday to Saturday'''
-    day = f'{month}/{day}/{year}'
-    dt = datetime.strptime(day, '%m/%d/%Y')
+    '''Get all of the dates of the week for a given date, from Monday to Sunday'''
+    date_str = f'{month}/{day}/{year}'
+    date = datetime.strptime(date_str, '%m/%d/%Y')
     
     # Get the dates that start and end the week
-    week_start_date = dt - timedelta(days=dt.weekday()+1)
+    week_start_date = date - timedelta(days=date.weekday())
     week_end_date = week_start_date + timedelta(days=6)
 
     # Get all of the dates for the week
