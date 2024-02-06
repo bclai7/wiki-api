@@ -1,6 +1,7 @@
-from flask import Flask, make_response, request, jsonify, Blueprint, current_app
+from flask import request, Blueprint, current_app
 import requests
 from datetime import datetime, timedelta
+from utils import get_days_in_range, create_response_object
 
 top_articles = Blueprint("top_articles", __name__)
 
@@ -35,7 +36,7 @@ def get_top_articles():
         return top_articles_json
     except ValueError:
         return create_response_object("Invalid date entered", "get", 400, "Bad Request")
-    except Exception as e:
+    except Exception:
         return create_response_object("Could not complete request at this time. Please make sure your request is valid or try again later.", "get", 500, "Could not complete request at this time")
 
 def get_week_top_articles(date: datetime):
@@ -79,25 +80,8 @@ def get_weekdays(date: datetime) -> list:
     week_end_date = week_start_date + timedelta(days=6)
 
     # Get all of the dates for the week
-    delta = week_end_date - week_start_date
-    days_of_week = []
-    for i in range(delta.days + 1):
-        day = week_start_date + timedelta(days=i)
-        if day.date() < datetime.today().date():
-            # Only add date if the date is before today
-            days_of_week.append(day)
+    days_of_week = get_days_in_range(week_start_date, week_end_date)
     
     return days_of_week
 
-def create_response_object(detail: str, method: str, status: int, title: str):
-    data = {
-        "detail": detail,
-        "method": method,
-        "status": status,
-        "title": title,
-    }
-    response = make_response(jsonify(data))
-    response.status_code = status
-    response.mimetype = 'application/json'
-    
-    return response
+
