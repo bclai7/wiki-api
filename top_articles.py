@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, jsonify, Blueprint
+from flask import Flask, make_response, request, jsonify, Blueprint, current_app
 import requests
 from datetime import datetime, timedelta
 
@@ -16,7 +16,7 @@ def get_top_articles():
         if year and month and day is None:
             # Month
             request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/all-days'
-            top_articles_response = requests.get(request_url, headers=HEADERS)
+            top_articles_response = requests.get(request_url, headers=current_app.config['HEADERS'])
             date = datetime(int(year), int(month), 1)
             first_day_of_this_month = datetime.today().replace(day=1)
             if date >= first_day_of_this_month:
@@ -35,7 +35,7 @@ def get_top_articles():
         return top_articles_json
     except ValueError:
         return create_response_object("Invalid date entered", "get", 400, "Bad Request")
-    except:
+    except Exception as e:
         return create_response_object("Could not complete request at this time. Please make sure your request is valid or try again later.", "get", 500, "Could not complete request at this time")
 
 def get_week_top_articles(date: datetime):
@@ -52,7 +52,7 @@ def get_week_top_articles(date: datetime):
     for day in days_list:
         # Get list of articles for this day
         request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{day.year}/{day:%m}/{day:%d}'
-        day_top_articles_response = requests.get(request_url, headers=HEADERS)
+        day_top_articles_response = requests.get(request_url, headers=current_app.config['HEADERS'])
         day_top_articles_json = day_top_articles_response.json()
         day_top_articles_list = day_top_articles_json['items'][0]['articles']
         
