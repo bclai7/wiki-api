@@ -24,3 +24,8 @@ def create_response_object(detail: str, method: str, status: int, title: str):
     response.mimetype = 'application/json'
     
     return response
+
+def get_week_start_and_end_dates(date: datetime):
+    week_start_date = date - timedelta(days=date.weekday())
+    week_end_date = week_start_date + timedelta(days=6)
+    return week_start_date, week_end_date

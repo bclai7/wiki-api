@@ -1,7 +1,7 @@
 from flask import request, Blueprint, current_app
 import requests
 from datetime import datetime, timedelta
-from utils import get_days_in_range, create_response_object
+from utils import get_days_in_range, create_response_object, get_week_start_and_end_dates
 
 top_articles = Blueprint("top_articles", __name__)
 
@@ -76,8 +76,7 @@ def get_week_top_articles(date: datetime, domain: str):
 def get_weekdays(date: datetime) -> list:
     '''Get all of the dates of the week for a given date, from Monday to Sunday'''
     # Get the dates that start and end the week
-    week_start_date = date - timedelta(days=date.weekday())
-    week_end_date = week_start_date + timedelta(days=6)
+    week_start_date, week_end_date = get_week_start_and_end_dates(date)
 
     # Get all of the dates for the week
     days_of_week = get_days_in_range(week_start_date, week_end_date)
