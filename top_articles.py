@@ -16,12 +16,12 @@ def get_top_articles(domain: str):
         # Check if monthly or weekly
         if year and month and day is None:
             # Month
-            request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/{domain}/all-access/{year}/{month}/all-days'
-            top_articles_response = requests.get(request_url, headers=current_app.config['HEADERS'])
             date = datetime(int(year), int(month), 1)
             first_day_of_this_month = datetime.today().replace(day=1)
             if date >= first_day_of_this_month:
                 return create_response_object("We do not yet have data for this month", "get", 404, "Not Found")
+            request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/{domain}/all-access/{date.year}/{date:%m}/all-days'
+            top_articles_response = requests.get(request_url, headers=current_app.config['HEADERS'])
             top_articles_json = {'data': {'type': 'month', 'dates': [date.strftime("%B %Y")], 'articles': top_articles_response.json()['items'][0]['articles']}}
         elif year and month and day:
             # Week
