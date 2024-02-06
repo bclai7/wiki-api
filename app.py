@@ -29,13 +29,13 @@ def get_top_articles():
     
     return top_articles.json()
 
-def get_week_top_articles(year, month, day):
+def get_week_top_articles(year: str, month: str, day: str):
     '''Get the top articles for a week. Takes in the year, month, and day as an argument and returns the top articles for the week starting
     on the Sunday before the given date throughout the Saturday after the given date'''
     days_list = get_weekdays(year, month, day)
     print(days_list)
 
-def get_weekdays(year, month, day) -> list:
+def get_weekdays(year: str, month: str, day: str) -> list:
     '''Get all of the dates of the week for a given date, from Sunday to Saturday'''
     day = f'{month}/{day}/{year}'
     dt = datetime.strptime(day, '%m/%d/%Y')
