@@ -1,6 +1,6 @@
 from flask import request, Blueprint, current_app
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 from utils import get_days_in_range, create_response_object, get_week_start_and_end_dates
 
 top_articles = Blueprint("top_articles", __name__)

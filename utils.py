@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify
+from flask import make_response, jsonify
 from datetime import datetime, timedelta
 
 def get_days_in_range(start_date: datetime, end_date: datetime) -> list:

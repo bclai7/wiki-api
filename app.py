@@ -1,5 +1,4 @@
-from flask import Flask, make_response, request, jsonify
-import requests
+from flask import Flask
 from datetime import datetime, timedelta
 from top_articles import top_articles
 
