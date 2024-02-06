@@ -20,8 +20,6 @@ def get_view_count(title: str, domain: str):
             last_day_of_month = calendar.monthrange(int(year), int(month))[1]
             end_date = datetime(int(year), int(month), last_day_of_month)
             first_day_of_this_month = datetime.today().replace(day=1)
-            if start_date >= end_date:
-                return create_response_object("Start date must be before end date", "get", 400, "Bad Request")
             if end_date >= first_day_of_this_month:
                 return create_response_object("We do not yet have data for this month", "get", 404, "Not Found")
             request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/{domain}/all-access/all-agents/{title}/monthly/{start_date.year}{start_date:%m}{start_date:%d}00/{end_date.year}{end_date:%m}{end_date:%d}00'
