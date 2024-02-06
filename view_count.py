@@ -28,6 +28,7 @@ def get_view_count(title: str, domain: str):
             view_count_response = requests.get(request_url, headers=current_app.config['HEADERS'])
             response_obj = view_count_response.json()['items'][0]
             view_count_json = {'data': {'type': 'month', 'dates': [start_date.strftime("%B %Y")], 'article': response_obj['article']}, 'domain': response_obj['project'], 'views': response_obj['views']}
+            pass
         else:
             return create_response_object("Could not complete request. Please make sure your request is valid.", "get", 500, "Could not complete request")
         
