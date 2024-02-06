@@ -1,9 +1,10 @@
 from flask import Flask, make_response, request, jsonify
 import requests
 from datetime import datetime, timedelta
+from top_articles import top_articles
 
 app = Flask(__name__)
-app.run(debug=True)
+app.register_blueprint(top_articles)
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'}
 
@@ -11,103 +12,3 @@ HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 def home():
     return 'This is the Wiki API'
 
-@app.route('/api/v1/articles/most_viewed', methods=['GET'])
-def get_top_articles():
-    # Get year, month, and day params
-    year = request.args.get('year')
-    month = request.args.get('month')
-    day = request.args.get('day')
-
-    try:
-        # Check if monthly or weekly
-        if year and month and day is None:
-            # Month
-            request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{year}/{month}/all-days'
-            top_articles_response = requests.get(request_url, headers=HEADERS)
-            date = datetime(int(year), int(month), 1)
-            first_day_of_this_month = datetime.today().replace(day=1)
-            if date >= first_day_of_this_month:
-                return create_response_object("We do not yet have data for this month", "get", 404, "Not Found")
-            top_articles_json = {'data': {'type': 'month', 'dates': [date.strftime("%B %Y")], 'articles': top_articles_response.json()['items'][0]['articles']}}
-        elif year and month and day:
-            # Week
-            date = datetime(int(year), int(month), int(day))
-            top_articles_list, dates_list = get_week_top_articles(date)
-            if(len(top_articles_list) == 0):
-                return create_response_object("We do not yet have data for this week", "get", 404, "Not Found")
-            top_articles_json = {'data': {'type': 'week', 'dates': dates_list, 'articles': top_articles_list}}
-        else:
-            return create_response_object("Could not complete request. Please make sure your request is valid.", "get", 500, "Could not complete request")
-        
-        return top_articles_json
-    except ValueError:
-        return create_response_object("Invalid date entered", "get", 400, "Bad Request")
-    except:
-        return create_response_object("Could not complete request at this time. Please make sure your request is valid or try again later.", "get", 500, "Could not complete request at this time")
-    
-    
-
-def get_week_top_articles(date: datetime):
-    '''Get the top articles for a week. Takes in the date as an argument and returns the top articles for the week starting
-    on the Monday before the given date throughout the Sunday after the given date'''
-    # Get list of days in the week for the given date
-    days_list = get_weekdays(date)
-    if len(days_list) == 0:
-        # If there are no valid dates for the week of the given date, return empty lists
-        return [], []
-
-    # For each day of the week, check the top articles and update dict with count
-    article_views_dict = {}
-    for day in days_list:
-        # Get list of articles for this day
-        request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/{day.year}/{day:%m}/{day:%d}'
-        day_top_articles_response = requests.get(request_url, headers=HEADERS)
-        day_top_articles_json = day_top_articles_response.json()
-        day_top_articles_list = day_top_articles_json['items'][0]['articles']
-        
-        # Update total week view count of each article on this day
-        for article in day_top_articles_list:
-            article_views_dict[article['article']] = article_views_dict.setdefault(article['article'], 0) + int(article['views'])
-        
-    # Sort list by views in descending order
-    sorted_article_views_list = sorted(article_views_dict.items(), key=lambda x:x[1], reverse=True)
-    
-    # Populate output list of objects to be returned
-    ranked_articles_list = []
-    rank = 1
-    for key, value in sorted_article_views_list:
-        ranked_articles_list.append({'article': key, 'rank': rank, 'views': value})
-        rank += 1
-        
-    return ranked_articles_list, days_list
-
-def get_weekdays(date: datetime) -> list:
-    '''Get all of the dates of the week for a given date, from Monday to Sunday'''
-    # Get the dates that start and end the week
-    week_start_date = date - timedelta(days=date.weekday())
-    week_end_date = week_start_date + timedelta(days=6)
-
-    # Get all of the dates for the week
-    delta = week_end_date - week_start_date
-    days_of_week = []
-    for i in range(delta.days + 1):
-        day = week_start_date + timedelta(days=i)
-        if day.date() < datetime.today().date():
-            # Only add date if the date is before today
-            days_of_week.append(day)
-    
-    return days_of_week
-
-def create_response_object(detail: str, method: str, status: int, title: str):
-    data = {
-        "detail": detail,
-        "method": method,
-        "status": status,
-        "title": title,
-    }
-    response = make_response(jsonify(data))
-    response.status_code = status
-    response.mimetype = 'application/json'
-    
-
-    return response
