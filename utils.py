@@ -13,6 +13,7 @@ def get_days_in_range(start_date: datetime, end_date: datetime) -> list:
     return days_list
 
 def create_response_object(detail: str, method: str, status: int, title: str):
+    '''Create a response object with the given details'''
     data = {
         "detail": detail,
         "method": method,
@@ -26,6 +27,7 @@ def create_response_object(detail: str, method: str, status: int, title: str):
     return response
 
 def get_week_start_and_end_dates(date: datetime):
+    '''Get the start and end dates of the week for the given date'''
     week_start_date = date - timedelta(days=date.weekday())
     week_end_date = week_start_date + timedelta(days=6)
     return week_start_date, week_end_date
