@@ -18,6 +18,9 @@ class TestTopArticles():
         # Invalid year entered
         response = app.test_client().get(self.MOST_VIEWED_URL, query_string={'year': '20211', 'month': '1'})
         assert response.status_code == 400
+        # Letters entered
+        response = app.test_client().get(self.MOST_VIEWED_URL, query_string={'year': 'f', 'month': 'a'})
+        assert response.status_code == 400
 
     def test_monthly_top_articles_404_response(self):
         # Future date entered
@@ -45,6 +48,9 @@ class TestTopArticles():
         assert response.status_code == 400
         # Invalid year entered
         response = app.test_client().get(self.MOST_VIEWED_URL, query_string={'year': '20211', 'month': '1', 'day': '10'})
+        assert response.status_code == 400
+        # Letters entered
+        response = app.test_client().get(self.MOST_VIEWED_URL, query_string={'year': 'f', 'month': 'a', 'day': 'v'})
         assert response.status_code == 400
 
     def test_weekly_top_articles_404_response(self):
