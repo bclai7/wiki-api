@@ -25,7 +25,7 @@ def get_view_count(title: str, domain: str):
             request_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/{domain}/all-access/all-agents/{title}/monthly/{start_date.year}{start_date:%m}{start_date:%d}00/{end_date.year}{end_date:%m}{end_date:%d}00'
             view_count_response = requests.get(request_url, headers=current_app.config['HEADERS'])
             response_obj = view_count_response.json()['items'][0]
-            view_count_json = {'data': {'type': 'month', 'dates': [start_date.strftime("%B %Y")], 'article': response_obj['article']}, 'domain': response_obj['project'], 'views': response_obj['views']}
+            view_count_json = {'data': {'type': 'month', 'dates': [start_date.strftime("%B %Y")], 'article': response_obj['article'], 'domain': response_obj['project'], 'views': response_obj['views']}}
         elif year and month and day:
             # Week
             date = datetime(int(year), int(month), int(day))
