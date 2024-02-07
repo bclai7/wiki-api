@@ -1,5 +1,4 @@
 from flask import Flask
-from datetime import datetime, timedelta
 from top_articles import top_articles
 from view_count import view_count
 from max_views import max_views
