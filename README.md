@@ -144,6 +144,7 @@ To run tests, run the following command in the project root directory
 - Caching results from 3rd party API
 - Use concurrency when summing view count totals where possible
 - Mocking 3rd party API calls in tests
+- More tests (ie. verifying counts are calculated correctly)
 - Logging and storing errors
 - Storing API returns in a database
 
